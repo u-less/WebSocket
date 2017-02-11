@@ -54,20 +54,20 @@ Example usage:
 ```
 `@javascript端调用`
 ```javascript
-    //发送聊天内容
-    $("#btn_Send").unbind("click").click(function () {
-        var content = $("#txt_Content").val();
-        var name = $("#txt_Name").val();
-        var newchat = Chat.create({ Name: name, Content: content, SourceId: "聊天室1" });
-        var dataBuffer = Chat.encode(newchat).finish();
-        var buffer = GenerateCmdBuffer(Controllers.ChatController, SendCommand.ClientUserChat, dataBuffer);
+//发送聊天内容
+$("#btn_Send").unbind("click").click(function () {
+    var content = $("#txt_Content").val();
+    var name = $("#txt_Name").val();
+    var newchat = Chat.create({ Name: name, Content: content, SourceId: "聊天室1" });
+    var dataBuffer = Chat.encode(newchat).finish();
+    var buffer = GenerateCmdBuffer(Controllers.ChatController, SendCommand.ClientUserChat, dataBuffer);
 
-        if (ws.readyState === WebSocket.OPEN) {
-            ws.send(buffer);
-        } else {
+    if (ws.readyState === WebSocket.OPEN) {
+        ws.send(buffer);
+    } else {
 
-        }
-    });
+    }
+});
 //构造发送数据(pare1:控制器id,pare2:消息command，pare3:对象的byte数组)
 function GenerateCmdBuffer(controller, command, dataBuffer) {
     var controllerLittleEndian = new dcodeIO.ByteBuffer(4).writeUint32(controller, 0).flip();
