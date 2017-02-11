@@ -10,7 +10,7 @@ javascript:/example/chat.js
 调试：可以直接实用.net core命令 dotnet run运行，也可以实用vs2017，但注意修改配置文件里的启动url地址和websocket的连接地址
 
 
-备注：消息实用protobuffer进行序列化，js端使用需要先申明proto数据格式（参考例子里的proto_market.json）
+备注：消息采用protobuffer进行序列化，js端使用需要先申明proto数据格式（参考例子里的proto_market.json）
 
 内存调优配置：appsettings.json=>WebSocket
 
