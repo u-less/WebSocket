@@ -1,0 +1,25 @@
+﻿<Project ToolsVersion="15.0" Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <TargetFramework>netcoreapp1.1</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <Content Include="wwwroot\Example\Chat.js" />
+    <Content Include="wwwroot\Example\index.html" />
+    <Content Include="wwwroot\Example\jquery-3.1.1.min.js" />
+    <Content Include="wwwroot\Example\Protobuffer\bytebuffer.min.js" />
+    <Content Include="wwwroot\Example\Protobuffer\long.min.js" />
+    <Content Include="wwwroot\Example\Protobuffer\protobuf.min.js" />
+    <Content Include="wwwroot\Example\proto\proto_market.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore" Version="1.1.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="1.1.0" />
+    <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="1.1.0" />
+    <PackageReference Include="Microsoft.AspNetCore.WebSockets.Server" Version="0.1.0" />
+    <PackageReference Include="Npgsql" Version="3.2.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\WS.Core\WS.Core.csproj" />
+  </ItemGroup>
+</Project>

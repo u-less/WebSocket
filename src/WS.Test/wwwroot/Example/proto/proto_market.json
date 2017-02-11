@@ -1,0 +1,18 @@
+﻿// 聊天数据
+message Chat{
+	// 名称
+	required string Name = 1;
+	// 聊天内容
+	required string Content = 2;
+	//来源标识
+	optional string SourceId = 3;
+}
+//返回错误信息
+message Error{
+	//产生错误的CommandId
+	required uint32 MsgCommandId=1;
+	//错误码
+	required uint32 ErrorCode=2;
+	//错误消息
+	required string Message = 3;
+}
