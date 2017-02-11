@@ -12,7 +12,7 @@ javascript:/example/chat.js
 
 备注：消息实用protobuffer进行序列化，js端使用需要先申明proto数据格式（参考例子里的proto_market.json）
 
-配置：appsettings.json=>WebSocket
+内存调优配置：appsettings.json=>WebSocket
 
 Example usage:
 
