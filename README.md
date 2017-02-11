@@ -52,3 +52,35 @@ Example usage:
         }
     }
 ```
+`@javascript端调用`
+```javascript
+    //发送聊天内容
+    $("#btn_Send").unbind("click").click(function () {
+        var content = $("#txt_Content").val();
+        var name = $("#txt_Name").val();
+        var newchat = Chat.create({ Name: name, Content: content, SourceId: "聊天室1" });
+        var dataBuffer = Chat.encode(newchat).finish();
+        var buffer = GenerateCmdBuffer(Controllers.ChatController, SendCommand.ClientUserChat, dataBuffer);
+
+        if (ws.readyState === WebSocket.OPEN) {
+            ws.send(buffer);
+        } else {
+
+        }
+    });
+//构造发送数据(pare1:控制器id,pare2:消息command，pare3:对象的byte数组)
+function GenerateCmdBuffer(controller, command, dataBuffer) {
+    var controllerLittleEndian = new dcodeIO.ByteBuffer(4).writeUint32(controller, 0).flip();
+    var controllerBigEndian = new Uint8Array(4);
+    controllerBigEndian[0] = controllerLittleEndian.view[3];
+    controllerBigEndian[1] = controllerLittleEndian.view[2];
+    controllerBigEndian[2] = controllerLittleEndian.view[1];
+    controllerBigEndian[3] = controllerLittleEndian.view[0];
+    var commandLittleEndian = new dcodeIO.ByteBuffer(2).writeUint16(command, 0).flip();
+    var commandBigEndian = new Uint8Array(2);
+    commandBigEndian[0] = commandLittleEndian.view[1];
+    commandBigEndian[1] = commandLittleEndian.view[0];
+    var allBuffer = dcodeIO.ByteBuffer.concat([controllerBigEndian, commandBigEndian, dataBuffer], "binary");
+    return allBuffer.view;
+}
+```
