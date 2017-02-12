@@ -37,7 +37,8 @@ Example usage:
     {
         public ChatController()//支持依赖注入
         {
-            RegisterWSHandler<Chat>(SendChat);//注册Action,Action只允许两个参数，第一个为session,第二个为自定义消息
+            //注册Action,Action只允许两个参数，第一个为session,第二个为自定义消息
+            RegisterWSHandler<Chat>(SendChat);
         }
 
         public async Task SendChat(WSSession session, IMsg messag)
