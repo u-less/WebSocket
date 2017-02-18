@@ -56,6 +56,13 @@ namespace WS.Core.Base
         {
             NoParameterWsActionDict.Add(command, func);
         }
+        /// <summary>
+        /// 当找不到合适的消息类型来反序列化的时候消息会流转到这里
+        /// </summary>
+        /// <param name="session">会话上下文</param>
+        /// <param name="buffer">数据buffer</param>
+        /// <param name="count">byte长度</param>
+        /// <returns></returns>
         public abstract Task Receive(WSSession session, WSArraySegment buffer, int count);
 
         public async Task Receive(WSSession session, ushort command, IMsg data)
