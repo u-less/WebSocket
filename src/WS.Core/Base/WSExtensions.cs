@@ -24,7 +24,7 @@ namespace WS.Core.Base
                     ArraySegment<byte> buffer = new ArraySegment<byte>(wsBuffer.Buffer.Array, wsBuffer.Buffer.Offset, (int)wm.Position + shortByteLength);
                     foreach (var session in sessions)
                     {
-                        var task = session.Socket.SendAsync(buffer, WebSocketMessageType.Binary, true, CancellationToken.None);
+                        var task = session.Send(buffer);
                         allTask.Add(task);
                     }
                     await Task.WhenAll(allTask.ToArray());
@@ -51,7 +51,7 @@ namespace WS.Core.Base
                 ArraySegment<byte> buffer = new ArraySegment<byte>(wsBuffer.Buffer.Array, wsBuffer.Buffer.Offset, shortByteLength);
                 foreach (var session in sessions)
                 {
-                    var task = session.Socket.SendAsync(buffer, WebSocketMessageType.Binary, true, CancellationToken.None);
+                    var task = session.Send(buffer);
                     allTask.Add(task);
                 }
                 await Task.WhenAll(allTask.ToArray());
@@ -62,7 +62,7 @@ namespace WS.Core.Base
             List<Task> allTask = new List<Task>();
             foreach (var session in sessions)
             {
-                var task = session.Socket.SendAsync(buffer, WebSocketMessageType.Binary, true, CancellationToken.None);
+                var task = session.Send(buffer);
                 allTask.Add(task);
             }
             await Task.WhenAll(allTask.ToArray());

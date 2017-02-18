@@ -90,7 +90,7 @@ namespace WS.Core.Base
                 {
                     Serializer.Serialize(wm, data);
                     ArraySegment<byte> buffer = new ArraySegment<byte>(wsBuffer.Buffer.Array, wsBuffer.Buffer.Offset, (int)wm.Position + uint16Length);
-                    await webSocket.SendAsync(buffer, WebSocketMessageType.Binary, true, CancellationToken.None);
+                    await Send(buffer);
                 }
             }
         }
@@ -111,12 +111,20 @@ namespace WS.Core.Base
             {
                 System.Buffer.BlockCopy(BitConverter.GetBytes(command), 0, wsBuffer.Buffer.Array, wsBuffer.Buffer.Offset, uint16Length);
                 ArraySegment<byte> buffer = new ArraySegment<byte>(wsBuffer.Buffer.Array, wsBuffer.Buffer.Offset, uint16Length);
-                await webSocket.SendAsync(buffer, WebSocketMessageType.Binary, true, CancellationToken.None);
+                await Send(buffer);
             }
         }
         public async Task Send(ArraySegment<byte> buffer)
         {
-            await webSocket.SendAsync(buffer, WebSocketMessageType.Binary, true, CancellationToken.None);
+            if (webSocket.State == WebSocketState.Open)
+            {
+                await webSocket.SendAsync(buffer, WebSocketMessageType.Binary, true, CancellationToken.None);
+            }
+            else
+            {
+                Dispose();
+            }
+
         }
         public delegate Task ReceiveHandle(WSSession session, WSArraySegment buffer, int count);
         public ReceiveHandle OnReceive { get; set; }
