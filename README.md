@@ -1,6 +1,8 @@
 # WebSocket
 Based on .net core websoket framework
 
+Nuget:Install-Package WS.Core 
+
 websocket url:/
 
 test url:/example/index.html
