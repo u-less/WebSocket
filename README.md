@@ -1,7 +1,7 @@
 # WebSocket
 Based on .net core websoket framework
 
-Nuget:Install-Package WS.Core 
+ **Nuget:Install-Package WS.Core 
 
 websocket url:/
 
