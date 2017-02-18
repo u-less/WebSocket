@@ -8,8 +8,11 @@ namespace WS.Core.DefaultMsg
     [Msg(0)]
     public class ErrorMsg : IMsg
     {
+        [ProtoMember(1)]
         public UInt16 MsgCommandId { get; set; }
+        [ProtoMember(2)]
         public int ErrorCode { get; set; }
+        [ProtoMember(3)]
         public string Message { get; set; }
     }
 }
