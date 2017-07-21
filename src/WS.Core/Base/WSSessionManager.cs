@@ -21,7 +21,7 @@ namespace WS.Core.Base
     {
         static Dictionary<UInt32, Type> controllerDict = new Dictionary<UInt32, Type>();
         static Func<Type, ILogger> LoggerGenerator;
-        public static void Init(IocManager ioc, Func<Type, ILogger> loggerGenerator)
+        public void Init(IocManager ioc, Func<Type, ILogger> loggerGenerator)
         {
             var assemblyNameList = DependencyContext.Default.GetDefaultAssemblyNames();
             var wsRouterType = typeof(WSRouteAttribute);
@@ -47,10 +47,10 @@ namespace WS.Core.Base
             }
             iocManager = ioc;
             LoggerGenerator = loggerGenerator;
-            SessionPool = new ConcurrentDictionary<Guid, WSSession>();
+            SessionPool = new ConcurrentDictionary<string, WSSession>();
         }
         static ConcurrentDictionary<Type, ILogger> loggerIdct = new ConcurrentDictionary<Type, ILogger>();
-        private static ILogger GetLogger(Type type)
+        protected ILogger GetLogger(Type type)
         {
             if (!loggerIdct.TryGetValue(type, out var logger))
             {
@@ -59,10 +59,17 @@ namespace WS.Core.Base
             }
             return logger;
         }
-        static Type sessionType = typeof(WSSession);
-        public static async Task Accept(HttpContext context, WebSocket webSocket)
+        protected static Type sessionType = typeof(WSSession);
+        public virtual async Task Accept(HttpContext context, WebSocket webSocket)
         {
             var session = new WSSession(context, webSocket, GetLogger(sessionType));
+            session.OnDispose = SessionDispose;
+            session.OnReceive = Receive;
+            SessionPool.TryAdd(session.SessionId, session);
+            await session.Receive();
+        }
+        public async Task Accept(WSSession session)
+        {
             session.OnDispose = SessionDispose;
             session.OnReceive = Receive;
             SessionPool.TryAdd(session.SessionId, session);
@@ -71,7 +78,7 @@ namespace WS.Core.Base
         static int uint16Length = sizeof(UInt16);
         static int uint32Length = sizeof(UInt32);
         static int uint48Length = uint16Length + uint32Length;
-        public static async Task Receive(WSSession session, WSArraySegment buffer, int count)
+        public async Task Receive(WSSession session, WSArraySegment buffer, int count)
         {
             var controllerId = BitConverter.ToUInt32(buffer.Buffer.Array, buffer.Buffer.Offset); //获取命令
             var controller = GetController(controllerId);
@@ -129,7 +136,7 @@ namespace WS.Core.Base
                     await controller.Receive(session, command);
             }
         }
-        public static void SessionDispose(WSSession session)
+        public virtual void SessionDispose(WSSession session)
         {
             foreach (var controller in session.ControllerDict.Values)
             {
@@ -151,13 +158,12 @@ namespace WS.Core.Base
             else
                 return null;
         }
-        public static WSSession GetSession(Guid sessionId)
+        public static bool TryGetSession(string sessionId, out WSSession session)
         {
-            SessionPool.TryGetValue(sessionId, out var session);
-            return session;
+            return SessionPool.TryGetValue(sessionId, out session);
         }
         static IocManager iocManager;
         public static IContainer Container { get { return iocManager.Container; } }
-        public static ConcurrentDictionary<Guid, WSSession> SessionPool { get; set; }
+        public static ConcurrentDictionary<string, WSSession> SessionPool { get; set; }
     }
 }

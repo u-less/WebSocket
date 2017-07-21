@@ -7,14 +7,19 @@ using System.Text;
 using System.Threading.Tasks;
 using WS.Core.Base;
 using WS.Core.IOC;
+using System.Linq;
+using Microsoft.Extensions.Options;
+using System.Net.WebSockets;
 
 namespace WS.Core
 {
     public static class BuildExtensions
     {
-        public static IApplicationBuilder UseWSSockets(this IApplicationBuilder app, IocManager ioc, Func<Type, ILogger> loggerGenerator)
+        public static WSSessionManager SessionManager { get; set; }
+        public static IApplicationBuilder UseWSSockets(this IApplicationBuilder app, IocManager ioc, Func<Type, ILogger> loggerGenerator, WSSessionManager sessionManager)
         {
-            WSSessionManager.Init(ioc, loggerGenerator);
+            SessionManager = sessionManager;
+            SessionManager.Init(ioc, loggerGenerator);
             return app.UseMiddleware<WSMiddleware>();
         }
     }
@@ -32,10 +37,11 @@ namespace WS.Core
             if (context.WebSockets.IsWebSocketRequest)
             {
                 var webSocket = await context.WebSockets.AcceptWebSocketAsync();
-                await WSSessionManager.Accept(context, webSocket);
+                await BuildExtensions.SessionManager.Accept(context, webSocket);
             }
             else
                 await _next.Invoke(context);
         }
     }
+
 }

@@ -12,7 +12,7 @@ namespace WS.Core.Base
 {
     public class WSSession : IDisposable
     {
-        public Guid SessionId
+        public string SessionId
         {
             get;
             set;
@@ -26,7 +26,7 @@ namespace WS.Core.Base
             this.context = context;
             this.webSocket = webSocket;
             this.logger = logger;
-            SessionId = Guid.NewGuid();
+            SessionId = Guid.NewGuid().ToString();
             receiveBuffer = WSConfig.BufferManager.Pull();
         }
         public ConcurrentDictionary<uint, IWSController> ControllerDict { get; set; } = new ConcurrentDictionary<uint, IWSController>();
@@ -60,23 +60,31 @@ namespace WS.Core.Base
             {
                 logger.LogError("消息长度大于缓存大小");
             }
-            var result = await webSocket.ReceiveAsync(buffer, CancellationToken.None);
-            if (result.MessageType == WebSocketMessageType.Binary)
+            try
             {
-                count += result.Count;
-                if (result.EndOfMessage)
+                var result = await webSocket.ReceiveAsync(buffer, CancellationToken.None);
+                if (result.MessageType == WebSocketMessageType.Binary)
                 {
-                    await OnReceive(this, wsBuffer, count);
-                    await Receive();
+                    count += result.Count;
+                    if (result.EndOfMessage)
+                    {
+                        await OnReceive(this, wsBuffer, count);
+                        await Receive();
+                    }
+                    else
+                    {
+                        var newBuffer = new ArraySegment<byte>(buffer.Array, buffer.Offset + count, buffer.Count - count);
+                        await ReceiveProcess(wsBuffer, newBuffer, count);
+                    }
                 }
-                else
+                if (result.CloseStatus.HasValue)
                 {
-                    var newBuffer = new ArraySegment<byte>(buffer.Array, buffer.Offset + count, buffer.Count - count);
-                    await ReceiveProcess(wsBuffer, newBuffer, count);
+                    Dispose();
                 }
             }
-            if (result.CloseStatus.HasValue)
+            catch (Exception e)
             {
+                logger.LogError(100, e, "未知异常");
                 Dispose();
             }
         }
@@ -132,8 +140,9 @@ namespace WS.Core.Base
         public DisposeHandle OnDispose { get; set; }
         public void Dispose()
         {
+            OnDispose?.Invoke(this);
+            sessionValues.Clear();
             receiveBuffer.Dispose();
-            OnDispose(this);
             context.Abort();
             webSocket.Abort();
         }
