@@ -7,6 +7,7 @@ using Autofac;
 using WS.Core;
 using WS.Core.IO;
 using System;
+using WS.Core.Base;
 
 namespace WS.Coin
 {
@@ -50,7 +51,7 @@ namespace WS.Coin
             app.UseStaticFiles();
 
             app.UseWebSockets();
-            app.UseWSSockets(GlobalConfig.DefaultIocManager, loggerGenerator);
+            app.UseWSSockets(GlobalConfig.DefaultIocManager, loggerGenerator,new WSSessionManager());
 
             GlobalConfig.DefaultIocManager.Build();//初始化默认IOC管理器
         }
