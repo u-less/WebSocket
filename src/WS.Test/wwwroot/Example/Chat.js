@@ -17,7 +17,7 @@ var SendCommand = {
 function StartWS(root) {
     var Chat = root.lookup("Chat");
 
-    var ws = new WebSocket("ws://192.168.199.236:8987/ws/market");
+    var ws = new WebSocket("ws://127.0.0.1:8987ws/market");
     ws.onopen = function (e) {
         console.log("Connection open...");
     };
